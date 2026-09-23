@@ -1,5 +1,4 @@
 use chrono::NaiveDate;
-use core::fmt;
 use std::{fmt::Display, io};
 
 
@@ -28,6 +27,7 @@ enum Status {
     Complete,
 }
 
+// Display trait implementation for enum Status
 impl std::fmt::Display for Status {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
     let text = match self {
@@ -47,6 +47,7 @@ struct Task {
   status: Status, 
 }
 
+// Display trait implementation for struct Task
 impl std::fmt::Display for Task {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
       writeln!(f, "Task info: {}, {}, {}, {}, {}",self.id, self.name, self.due_date, self.priority, self.status)
@@ -54,32 +55,44 @@ impl std::fmt::Display for Task {
 }
 
 fn main() {
+  // vector containing all Task instances
   let mut vec: Vec<Task> = Vec::new();
 
   println!("Enter you Task and info: ");
 
+  // -----------------------------------INPUT--------------------------------------------- (i have to change this to a helper function fs)
+  println!("id (manual for now):");
   let mut id_input = String::new();
   io::stdin().read_line(&mut id_input).expect("Faild to read line");
 
+  println!("Task Name: ");
   let mut name_input = String::new();
   io::stdin().read_line(&mut name_input).expect("Faild to read line");
 
+  println!("Due date(yyyy-mm-dd):");
   let mut due_date_input = String::new();
   io::stdin().read_line(&mut due_date_input).expect("Faild to read line");
 
+  println!("Priority(high, medium, low): ");
   let mut priority_input = String::new();
   io::stdin().read_line(&mut priority_input).expect("Faild to read line");
 
+  println!("Status(incomplete, complete): ");
   let mut status_input = String::new();
   io::stdin().read_line(&mut status_input).expect("Faild to read line");
 
+  println!("----------------");
+    // -----------------------------------INPUT---------------------------------------------
+
+
+
   let id_input: u32 = match id_input.trim().parse() {
-    Ok(Result) => Result,
+    Ok(value) => value,
     Err(_) => panic!("Please enter a valid number"),
   };
 
   let due_date_input: NaiveDate = match due_date_input.trim().parse() {
-    Ok(Result) => Result,
+    Ok(value) => value,
     Err(_) => panic!("Please enter a valid date"),
   };
 
