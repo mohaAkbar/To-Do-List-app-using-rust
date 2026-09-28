@@ -1,5 +1,6 @@
 use chrono::NaiveDate;
 use std::{fmt::Display, io};
+use inquire::{Text, CustomType};
 
 
 // enum for the priorty of a task
@@ -58,33 +59,23 @@ fn main() {
   // vector containing all Task instances
   let mut vec: Vec<Task> = Vec::new();
 
-  println!("Enter you Task and info: ");
+  println!("Enter your Task info: ");
 
-  // -----------------------------------INPUT--------------------------------------------- (i have to change this to a helper function fs)
-  println!("id (manual for now):");
-  let mut id_input = String::new();
-  io::stdin().read_line(&mut id_input).expect("Faild to read line");
+  // -----------------------------------INPUT--------------------------------------------- 
 
-  println!("Task Name: ");
-  let mut name_input = String::new();
-  io::stdin().read_line(&mut name_input).expect("Faild to read line");
+  let mut id_input = Text::new("id (manual for now):").prompt().unwrap();
 
-  println!("Due date(yyyy-mm-dd):");
-  let mut due_date_input = String::new();
-  io::stdin().read_line(&mut due_date_input).expect("Faild to read line");
+  let mut name_input = Text::new("Task Name: ").prompt().unwrap();
 
-  println!("Priority(high, medium, low): ");
-  let mut priority_input = String::new();
-  io::stdin().read_line(&mut priority_input).expect("Faild to read line");
+  let mut due_date_input = Text::new("Due date(yyyy-mm-dd):").prompt().unwrap();
 
-  println!("Status(incomplete, complete): ");
-  let mut status_input = String::new();
-  io::stdin().read_line(&mut status_input).expect("Faild to read line");
+  let mut priority_input = Text::new("Priority(high, medium, low): ").prompt().unwrap();
 
-  println!("----------------");
+  let mut status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
+
     // -----------------------------------INPUT---------------------------------------------
 
-
+  println!("----------------");
 
   let id_input: u32 = match id_input.trim().parse() {
     Ok(value) => value,
