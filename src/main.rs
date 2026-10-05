@@ -55,28 +55,44 @@ impl std::fmt::Display for Task {
   }
 }
 
+// implementation functions, CRUD for Task struct
+impl Task {
+  fn add(tasks_vec: &mut Vec<Task>, id_input: u32, name_input: String, due_date_input: NaiveDate, priority_input: Priority, status_input: Status) {
+    let new_task = Task {
+      id: id_input,
+      name: name_input,
+      due_date: due_date_input,
+      priority: priority_input,
+      status: status_input,
+    };
+    tasks_vec.push(new_task)
+  }
+}
+
 fn main() {
   // vector containing all Task instances
-  let mut vec: Vec<Task> = Vec::new();
+  let mut tasks_vec: Vec<Task> = Vec::new();
 
   println!("Enter your Task info: ");
 
+  // user input layer
   // -----------------------------------INPUT--------------------------------------------- 
 
-  let mut id_input = Text::new("id (manual for now):").prompt().unwrap();
+  let id_input = Text::new("id (manual for now):").prompt().unwrap();
 
-  let mut name_input = Text::new("Task Name: ").prompt().unwrap();
+  let name_input = Text::new("Task Name: ").prompt().unwrap();
 
-  let mut due_date_input = Text::new("Due date(yyyy-mm-dd):").prompt().unwrap();
+  let due_date_input = Text::new("Due date(yyyy-mm-dd):").prompt().unwrap();
 
-  let mut priority_input = Text::new("Priority(high, medium, low): ").prompt().unwrap();
+  let priority_input = Text::new("Priority(high, medium, low): ").prompt().unwrap();
 
-  let mut status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
+  let status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
 
     // -----------------------------------INPUT---------------------------------------------
 
   println!("----------------");
 
+  // validation and parsing layer for user input
   let id_input: u32 = match id_input.trim().parse() {
     Ok(value) => value,
     Err(_) => panic!("Please enter a valid number"),
@@ -100,18 +116,19 @@ fn main() {
     _ => panic!("Please enter a valid status"),
   };
 
- 
+  // calling the add function
+  Task::add(&mut tasks_vec, id_input,name_input, due_date_input, priority_input, status_input);
 
-  let mut task1 = Task {
-    id: id_input,
-    name: name_input,
-    due_date: due_date_input,
-    priority: priority_input,
-    status: status_input,
-  };
+  //let mut task1 = Task {
+    //id: id_input,
+    //name: name_input,
+    //due_date: due_date_input,
+    //priority: priority_input,
+    //status: status_input,
+  //};
   
-  vec.push(task1);
+  //vec.push(task1);
 
-  println!("{}", vec[0]);
+  println!("{}", tasks_vec[0]);
 
 }
