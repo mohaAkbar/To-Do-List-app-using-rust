@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
-use std::{fmt::Display, io};
-use inquire::{Text, CustomType};
+use std::{fmt::Display, fmt::Result, fmt::Formatter};
+use inquire::{Text, Select};
 
 
 // enum for the priorty of a task
@@ -11,8 +11,8 @@ enum Priority {
 }
 
 // manually displaying the variants using fmt::Display for Priority enum
-impl std::fmt::Display for Priority {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl Display for Priority {
+  fn fmt(&self, f: &mut Formatter) -> Result {
     let text = match self {
       Priority::High => "high",
       Priority::Medium => "medium",
@@ -29,8 +29,8 @@ enum Status {
 }
 
 // Display trait implementation for enum Status
-impl std::fmt::Display for Status {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl Display for Status {
+  fn fmt(&self, f: &mut Formatter) -> Result {
     let text = match self {
       Status::Incomplete => "Incomplete",
       Status::Complete => "Complete",
@@ -49,8 +49,8 @@ struct Task {
 }
 
 // Display trait implementation for struct Task
-impl std::fmt::Display for Task {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for Task {
+  fn fmt(&self, f: &mut Formatter<'_>) -> Result {
       writeln!(f, "Task info: {}, {}, {}, {}, {}",self.id, self.name, self.due_date, self.priority, self.status)
   }
 }
@@ -69,15 +69,63 @@ impl Task {
   }
 }
 
+//enum for UI menu options
+enum MenuOptions {
+  Add,
+  View,
+  Delete,
+  Update,
+}
+
+//Display trait for MenuOptions
+impl Display for MenuOptions {
+  fn fmt(&self, f: &mut Formatter) -> Result {
+    let text = match self {
+      MenuOptions::Add => "add",
+      MenuOptions::View => "view",
+      MenuOptions::Delete => "delete",
+      MenuOptions::Update => "update",
+    };
+    write!(f, "{}", text)
+  }
+}
+
+// menu selection implementation using the MenuOptions enum
+impl MenuOptions {
+  fn get_menu_option(options_vec: Vec<MenuOptions>) {
+    let choice = Select::new("What do you want to do?", options_vec).prompt().unwrap();
+    println!("> {}ing", choice);
+  }
+}
+
 fn main() {
+  
+  // this is the app intro UI
+  println!("");
+  println!("=== Strictly-Done ===");
+  println!("");
+  println!("Enter your Task info: ");
+
+  //vector containing the menu options add, view, delete, update
+  let options_vec: Vec<MenuOptions> = vec![
+    MenuOptions::Add,
+    MenuOptions::View,
+    MenuOptions::Delete,
+    MenuOptions::Update,
+  ];
+
+  // calling the menu function to show menu
+  MenuOptions::get_menu_option(options_vec);
+
   // vector containing all Task instances
   let mut tasks_vec: Vec<Task> = Vec::new();
 
-  println!("Enter your Task info: ");
+  
 
   // user input layer
   // -----------------------------------INPUT--------------------------------------------- 
 
+  // actual input layer, input taken from user
   let id_input = Text::new("id (manual for now):").prompt().unwrap();
 
   let name_input = Text::new("Task Name: ").prompt().unwrap();
@@ -88,9 +136,7 @@ fn main() {
 
   let status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
 
-    // -----------------------------------INPUT---------------------------------------------
-
-  println!("----------------");
+  println!("=======================================");
 
   // validation and parsing layer for user input
   let id_input: u32 = match id_input.trim().parse() {
@@ -116,9 +162,12 @@ fn main() {
     _ => panic!("Please enter a valid status"),
   };
 
+  // -----------------------------------INPUT---------------------------------------------
+
   // calling the add function
   Task::add(&mut tasks_vec, id_input,name_input, due_date_input, priority_input, status_input);
 
+  // OLD CODE BELOW, REMOVE WHEN DONE
   //let mut task1 = Task {
     //id: id_input,
     //name: name_input,
