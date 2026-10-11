@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use std::{fmt::Display, fmt::Result, fmt::Formatter};
+use std::{fmt::{Display, Formatter, Result}, ops::Add};
 use inquire::{Text, Select};
 
 
@@ -57,7 +57,55 @@ impl Display for Task {
 
 // implementation functions, CRUD for Task struct
 impl Task {
-  fn add(tasks_vec: &mut Vec<Task>, id_input: u32, name_input: String, due_date_input: NaiveDate, priority_input: Priority, status_input: Status) {
+
+  // this is the add function, it takes input, then parses it, and lastly pushes it into the tasks vector
+  fn add(tasks_vec: &mut Vec<Task>) {
+
+    // telling user to enter his task details
+    println!("Enter your task info");
+
+    // user input layer
+    // -----------------------------------INPUT--------------------------------------------- 
+
+    // actual input layer, input taken from user
+    let id_input = Text::new("id (manual for now):").prompt().unwrap();
+
+    let name_input = Text::new("Task Name: ").prompt().unwrap();
+
+    let due_date_input = Text::new("Due date(yyyy-mm-dd):").prompt().unwrap();
+
+    let priority_input = Text::new("Priority(high, medium, low): ").prompt().unwrap();
+
+    let status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
+
+    println!("=======================================");
+
+    // validation and parsing layer for user input
+    let id_input: u32 = match id_input.trim().parse() {
+      Ok(value) => value,
+      Err(_) => panic!("Please enter a valid number"),
+    };
+
+    let due_date_input: NaiveDate = match due_date_input.trim().parse() {
+      Ok(value) => value,
+      Err(_) => panic!("Please enter a valid date"),
+    };
+
+    let priority_input: Priority = match priority_input.trim().to_lowercase().as_str() {
+      "high" => Priority::High,
+      "medium" => Priority::Medium,
+      "low" => Priority::Low,
+      _ => panic!("Please enter a valid priotity"),
+    };
+
+    let status_input: Status = match status_input.trim().to_lowercase().as_str() {
+      "incomplete" => Status::Incomplete,
+      "complete" => Status::Complete,
+      _ => panic!("Please enter a valid status"),
+    };
+
+    // -----------------------------------INPUT---------------------------------------------
+
     let new_task = Task {
       id: id_input,
       name: name_input,
@@ -67,6 +115,26 @@ impl Task {
     };
     tasks_vec.push(new_task)
   }
+
+  // this is the view function it is not implemented yet
+  fn view() {
+    println!("view function not implemented yet")
+  }
+
+  // this is the delete function it is not implemented yet
+  fn delete() {
+    println!("delete function not implemented yet")
+  }
+
+  // this is the update function it is not implemented yet
+  fn update() {
+    println!("update function not implemented yet")
+  }
+
+  // this is the exit function it is not implemented yet (the * star is used for dereferencing)
+  fn exit(stop_signal: &mut bool) {
+    *stop_signal = true;
+  }
 }
 
 //enum for UI menu options
@@ -75,16 +143,18 @@ enum MenuOptions {
   View,
   Delete,
   Update,
+  Exit,
 }
 
 //Display trait for MenuOptions
 impl Display for MenuOptions {
   fn fmt(&self, f: &mut Formatter) -> Result {
     let text = match self {
-      MenuOptions::Add => "add",
-      MenuOptions::View => "view",
-      MenuOptions::Delete => "delete",
-      MenuOptions::Update => "update",
+      MenuOptions::Add => "Add",
+      MenuOptions::View => "View",
+      MenuOptions::Delete => "Delete",
+      MenuOptions::Update => "Update",
+      MenuOptions::Exit => "Exit"
     };
     write!(f, "{}", text)
   }
@@ -92,92 +162,57 @@ impl Display for MenuOptions {
 
 // menu selection implementation using the MenuOptions enum
 impl MenuOptions {
-  fn get_menu_option(options_vec: Vec<MenuOptions>) {
+  fn get_menu_option(options_vec: Vec<MenuOptions>) -> MenuOptions {
     let choice = Select::new("What do you want to do?", options_vec).prompt().unwrap();
-    println!("> {}ing", choice);
+    return choice;
   }
 }
 
 fn main() {
-  
-  // this is the app intro UI
-  println!("");
-  println!("=== Strictly-Done ===");
-  println!("");
-  println!("Enter your Task info: ");
 
-  //vector containing the menu options add, view, delete, update
-  let options_vec: Vec<MenuOptions> = vec![
-    MenuOptions::Add,
-    MenuOptions::View,
-    MenuOptions::Delete,
-    MenuOptions::Update,
-  ];
+  // just a app exiting signal
+    let mut stop_signal: bool = false;
 
-  // calling the menu function to show menu
-  MenuOptions::get_menu_option(options_vec);
+   loop {
 
-  // vector containing all Task instances
-  let mut tasks_vec: Vec<Task> = Vec::new();
+    // this is the app intro UI
+    println!("");
+    println!("=== Strictly-Done ===");
+    println!("");
 
-  
+    // vector containing all Task instances
+    let mut tasks_vec: Vec<Task> = Vec::new();
 
-  // user input layer
-  // -----------------------------------INPUT--------------------------------------------- 
+    //vector containing the menu options add, view, delete, update
+    let options_vec: Vec<MenuOptions> = vec![
+      MenuOptions::Add,
+      MenuOptions::View,
+      MenuOptions::Delete,
+      MenuOptions::Update,
+      MenuOptions::Exit,
+    ];
 
-  // actual input layer, input taken from user
-  let id_input = Text::new("id (manual for now):").prompt().unwrap();
+    // calling the menu function to show menu
+    let choice = MenuOptions::get_menu_option(options_vec);
+    
+    // this matches the choice of the user to the corresponding function
+    match choice {
+      MenuOptions::Add => Task::add(&mut tasks_vec),
+      MenuOptions::View => Task::view(),
+      MenuOptions::Delete => Task::delete(),
+      MenuOptions::Update => Task::update(),
+      MenuOptions::Exit => Task::exit(&mut stop_signal),
+    }
 
-  let name_input = Text::new("Task Name: ").prompt().unwrap();
+    if stop_signal {
+      break;
+    }
 
-  let due_date_input = Text::new("Due date(yyyy-mm-dd):").prompt().unwrap();
+    if !tasks_vec.is_empty() {
+    println!("{}", tasks_vec[0]);
+    }
 
-  let priority_input = Text::new("Priority(high, medium, low): ").prompt().unwrap();
 
-  let status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
-
-  println!("=======================================");
-
-  // validation and parsing layer for user input
-  let id_input: u32 = match id_input.trim().parse() {
-    Ok(value) => value,
-    Err(_) => panic!("Please enter a valid number"),
-  };
-
-  let due_date_input: NaiveDate = match due_date_input.trim().parse() {
-    Ok(value) => value,
-    Err(_) => panic!("Please enter a valid date"),
-  };
-
-  let priority_input: Priority = match priority_input.trim().to_lowercase().as_str() {
-    "high" => Priority::High,
-    "medium" => Priority::Medium,
-    "low" => Priority::Low,
-    _ => panic!("Please enter a valid priotity"),
-  };
-
-  let status_input: Status = match status_input.trim().to_lowercase().as_str() {
-    "incomplete" => Status::Incomplete,
-    "complete" => Status::Complete,
-    _ => panic!("Please enter a valid status"),
-  };
-
-  // -----------------------------------INPUT---------------------------------------------
-
-  // calling the add function
-  Task::add(&mut tasks_vec, id_input,name_input, due_date_input, priority_input, status_input);
-
-  // OLD CODE BELOW, REMOVE WHEN DONE
-  //let mut task1 = Task {
-    //id: id_input,
-    //name: name_input,
-    //due_date: due_date_input,
-    //priority: priority_input,
-    //status: status_input,
-  //};
-  
-  //vec.push(task1);
-
-  println!("{}", tasks_vec[0]);
+  }
 
 }
