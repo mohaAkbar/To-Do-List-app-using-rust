@@ -111,9 +111,14 @@ impl Task {
     tasks_vec.push(task)
   }
 
-  // this is the view function it is not implemented yet
-  fn view() {
-    println!("view function not implemented yet")
+  //this is the view function for viewing all tasks
+  fn view(tasks_vec: &mut Vec<Task>) {
+
+    // going through and printing all the tasks
+    println!("Your Tasks Are:");
+    for i in tasks_vec {
+      println!("{}", i);
+    }
   }
 
   // this is the delete function it is not implemented yet
@@ -130,6 +135,7 @@ impl Task {
   fn exit(stop_signal: &mut bool) {
     *stop_signal = true;
   }
+  
 }
 
 //enum for UI menu options
@@ -178,8 +184,6 @@ fn main() {
 
    loop {
 
-    
-
     //vector containing the menu options add, view, delete, update
     let options_vec: Vec<MenuOptions> = vec![
       MenuOptions::Add,
@@ -195,7 +199,7 @@ fn main() {
     // this matches the choice of the user to the corresponding function
     match choice {
       MenuOptions::Add => Task::add(&mut tasks_vec, Task::get_input()),
-      MenuOptions::View => Task::view(),
+      MenuOptions::View => Task::view(&mut tasks_vec),
       MenuOptions::Delete => Task::delete(),
       MenuOptions::Update => Task::update(),
       MenuOptions::Exit => Task::exit(&mut stop_signal),
@@ -205,12 +209,6 @@ fn main() {
     if stop_signal {
       break;
     }
-
-    // checks if vec is empty or not so it can print whats inside
-    if !tasks_vec.is_empty() {
-    println!("{}", tasks_vec[0]);
-    }
-
 
   }
 
