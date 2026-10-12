@@ -173,10 +173,12 @@ fn main() {
   // an app exiting signal
     let mut stop_signal: bool = false;
 
-   loop {
-
     // vector containing all Task instances
     let mut tasks_vec: Vec<Task> = Vec::new();
+
+   loop {
+
+    
 
     //vector containing the menu options add, view, delete, update
     let options_vec: Vec<MenuOptions> = vec![
