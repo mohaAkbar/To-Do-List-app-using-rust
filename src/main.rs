@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use std::{fmt::{Display, Formatter, Result}, ops::Add};
+use std::fmt::{Display, Formatter, Result};
 use inquire::{Text, Select};
 
 
@@ -58,14 +58,8 @@ impl Display for Task {
 // implementation functions, CRUD for Task struct
 impl Task {
 
-  // this is the add function, it takes input, then parses it, and lastly pushes it into the tasks vector
-  fn add(tasks_vec: &mut Vec<Task>) {
-
-    // telling user to enter his task details
-    println!("Enter your task info");
-
-    // user input layer
-    // -----------------------------------INPUT--------------------------------------------- 
+  // this is the input taking and organizing function
+  fn get_input() -> Task {
 
     // actual input layer, input taken from user
     let id_input = Text::new("id (manual for now):").prompt().unwrap();
@@ -77,8 +71,6 @@ impl Task {
     let priority_input = Text::new("Priority(high, medium, low): ").prompt().unwrap();
 
     let status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
-
-    println!("=======================================");
 
     // validation and parsing layer for user input
     let id_input: u32 = match id_input.trim().parse() {
@@ -104,16 +96,19 @@ impl Task {
       _ => panic!("Please enter a valid status"),
     };
 
-    // -----------------------------------INPUT---------------------------------------------
-
-    let new_task = Task {
+    Task {
       id: id_input,
       name: name_input,
       due_date: due_date_input,
       priority: priority_input,
       status: status_input,
-    };
-    tasks_vec.push(new_task)
+    }
+  }
+
+  // this is the add function, it takes input, then parses it, and lastly pushes it into the tasks vector
+  fn add(tasks_vec: &mut Vec<Task>, task: Task) {
+
+    tasks_vec.push(task)
   }
 
   // this is the view function it is not implemented yet
@@ -170,15 +165,15 @@ impl MenuOptions {
 
 fn main() {
 
-  // just a app exiting signal
-    let mut stop_signal: bool = false;
-
-   loop {
-
-    // this is the app intro UI
+  // this is the app intro UI
     println!("");
     println!("=== Strictly-Done ===");
     println!("");
+
+  // an app exiting signal
+    let mut stop_signal: bool = false;
+
+   loop {
 
     // vector containing all Task instances
     let mut tasks_vec: Vec<Task> = Vec::new();
@@ -197,17 +192,19 @@ fn main() {
     
     // this matches the choice of the user to the corresponding function
     match choice {
-      MenuOptions::Add => Task::add(&mut tasks_vec),
+      MenuOptions::Add => Task::add(&mut tasks_vec, Task::get_input()),
       MenuOptions::View => Task::view(),
       MenuOptions::Delete => Task::delete(),
       MenuOptions::Update => Task::update(),
       MenuOptions::Exit => Task::exit(&mut stop_signal),
     }
 
+    // if user chooses exit() the stop_signal variable becomes false and the loop/app stops
     if stop_signal {
       break;
     }
 
+    // checks if vec is empty or not so it can print whats inside
     if !tasks_vec.is_empty() {
     println!("{}", tasks_vec[0]);
     }
