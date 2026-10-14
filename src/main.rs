@@ -1,6 +1,7 @@
 use chrono::NaiveDate;
-use std::fmt::{Display, Formatter, Result};
+use std::{fmt::{Display, Formatter, Result}};
 use inquire::{Text, Select};
+use std::sync::atomic::{AtomicU32, Ordering};
 
 
 // enum for the priorty of a task
@@ -59,24 +60,30 @@ impl Display for Task {
 impl Task {
 
   // this is the input taking and organizing function
-  fn get_input() -> Task {
+  fn get_task_info() -> Task {
+
+    //generating the user id by just incrementing the COUNTER each time a task is added
+    static COUNTER: AtomicU32 = AtomicU32::new(1);
+    let generated_id = COUNTER.fetch_add(1, Ordering::Relaxed);
+
+    //let id_input = Text::new("id (manual for now):").prompt().unwrap();
 
     // actual input layer, input taken from user
-    let id_input = Text::new("id (manual for now):").prompt().unwrap();
-
     let name_input = Text::new("Task Name: ").prompt().unwrap();
 
     let due_date_input = Text::new("Due date(yyyy-mm-dd):").prompt().unwrap();
 
     let priority_input = Text::new("Priority(high, medium, low): ").prompt().unwrap();
 
-    let status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
+    //let status_input = Text::new("Status(incomplete, complete): ").prompt().unwrap();
+
+    let status = Status::Incomplete;
 
     // validation and parsing layer for user input
-    let id_input: u32 = match id_input.trim().parse() {
-      Ok(value) => value,
-      Err(_) => panic!("Please enter a valid number"),
-    };
+    //let id_input: u32 = match id_input.trim().parse() {
+      //Ok(value) => value,
+      //Err(_) => panic!("Please enter a valid number"),
+    //};
 
     let due_date_input: NaiveDate = match due_date_input.trim().parse() {
       Ok(value) => value,
@@ -90,22 +97,23 @@ impl Task {
       _ => panic!("Please enter a valid priotity"),
     };
 
-    let status_input: Status = match status_input.trim().to_lowercase().as_str() {
-      "incomplete" => Status::Incomplete,
-      "complete" => Status::Complete,
-      _ => panic!("Please enter a valid status"),
-    };
+    //let status_input: Status = match status_input.trim().to_lowercase().as_str() {
+      //"incomplete" => Status::Incomplete,
+      //"complete" => Status::Complete,
+      //_ => panic!("Please enter a valid status"),
+    //};
 
+    // this is what gets pushed later in tasks_vec
     Task {
-      id: id_input,
+      id: generated_id,
       name: name_input,
       due_date: due_date_input,
       priority: priority_input,
-      status: status_input,
+      status: status,
     }
   }
 
-  // this is the add function, it takes input, then parses it, and lastly pushes it into the tasks vector
+  // this is the add function, it takes the built task from user input in get_input then pushes it into tasks_vec
   fn add(tasks_vec: &mut Vec<Task>, task: Task) {
 
     tasks_vec.push(task)
@@ -212,7 +220,7 @@ fn main() {
     
     // this matches the choice of the user to the corresponding function
     match choice {
-      MenuOptions::Add => Task::add(&mut tasks_vec, Task::get_input()),
+      MenuOptions::Add => Task::add(&mut tasks_vec, Task::get_task_info()),
       MenuOptions::View => Task::view(&mut tasks_vec),
       MenuOptions::Delete => Task::delete(&mut tasks_vec),
       MenuOptions::Update => Task::update(),
