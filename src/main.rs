@@ -121,9 +121,23 @@ impl Task {
     }
   }
 
-  // this is the delete function it is not implemented yet
-  fn delete() {
-    println!("delete function not implemented yet")
+  // this is the delete function for tasks, it displays all tasks, lets user input id of task to delete, then deletes using retain
+  fn delete(tasks_vec: &mut Vec<Task>) {
+    
+    for i in &*tasks_vec {
+      println!("{}", i)
+
+
+    }
+
+    let id_to_delete = Text::new("ENTER THE ID FOR THE TASK TO DELETE").prompt().unwrap();
+
+    let id_to_delete: u32 = match id_to_delete.trim().parse() {
+      Ok(value) => value,
+      Err(_) => panic!("Please enter a valid number"),
+    };
+
+    tasks_vec.retain(|task| task.id != id_to_delete);
   }
 
   // this is the update function it is not implemented yet
@@ -200,7 +214,7 @@ fn main() {
     match choice {
       MenuOptions::Add => Task::add(&mut tasks_vec, Task::get_input()),
       MenuOptions::View => Task::view(&mut tasks_vec),
-      MenuOptions::Delete => Task::delete(),
+      MenuOptions::Delete => Task::delete(&mut tasks_vec),
       MenuOptions::Update => Task::update(),
       MenuOptions::Exit => Task::exit(&mut stop_signal),
     }
